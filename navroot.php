@@ -1,5 +1,5 @@
 <?php
-namespace htlwy\Header;
+namespace htlwy\headerphp;
 
 /**
  * Class navroot stellt die Basis des gesamten Objektbaums dar.

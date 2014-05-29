@@ -1,10 +1,9 @@
 <?php
-namespace htlwy\Header;
+namespace htlwy\headerphp;
 
-use htlwy\Header\Option\Head;
-use htlwy\Header\Option\Target;
-use htlwy\Header\Option\Title;
-use htlwy\Header\Option\Visible;
+use htlwy\headerphp\Option\Target;
+use htlwy\headerphp\Option\Title;
+use htlwy\headerphp\Option\Visible;
 
 /**
  * Class nav: Basic element, each instance represents an entry in the menu

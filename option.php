@@ -1,5 +1,5 @@
 <?php
-namespace htlwy\Header;
+namespace htlwy\headerphp;
 
 /**
  * Class Option

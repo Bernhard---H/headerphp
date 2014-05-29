@@ -1,8 +1,8 @@
 <?php
-namespace htlwy\Header\Option;
+namespace htlwy\headerphp\Option;
 
-use htlwy\Header\Navroot;
-use htlwy\Header\Option;
+use htlwy\headerphp\Navroot;
+use htlwy\headerphp\Option;
 
 /**
  * Class Title

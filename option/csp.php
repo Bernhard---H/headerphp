@@ -1,7 +1,7 @@
 <?php
-namespace htlwy\Header\Option;
+namespace htlwy\headerphp\Option;
 
-use htlwy\Header\Option;
+use htlwy\headerphp\Option;
 
 /**
  * Class CSP
