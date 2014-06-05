@@ -15,7 +15,7 @@ class CSP extends Option
      * @var array
      */
     protected static $default = array("default-src" => "'none'", "script-src" => "'self'",
-            "style-src" => "'self'", "img-src" => "'self'", "connect-src" => "'self'",
+            "style-src" => "'self' 'unsafe-inline'", "img-src" => "'self'", "connect-src" => "'self'",
             "form-action" => "'self'", "reflected-xss" => "block");
 
     /**
