@@ -35,14 +35,7 @@ class Design extends Option
         if(is_string($design))
         {
             $this->_design = strtolower($design);
-            if($this->_design == '' || $this->_design == 'std')
-            {
-                $this->_isdefault = true;
-            }
-            else
-            {
-                $this->_isdefault = false;
-            }
+            $this->_isdefault = false;
         }
         else
         {
