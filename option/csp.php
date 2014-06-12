@@ -29,7 +29,7 @@ class CSP extends Option
      *
      * @var bool
      */
-    protected $activated = false;
+    protected $activated = true;
 
     protected $csp = '';
 
