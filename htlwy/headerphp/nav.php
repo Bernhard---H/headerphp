@@ -3,12 +3,11 @@ namespace htlwy\headerphp;
 
 use htlwy\headerphp\Option\Target;
 use htlwy\headerphp\Option\Title;
-use htlwy\headerphp\Option\Visible;
 
 /**
  * Class nav: Basic element, each instance represents an entry in the menu
  */
-class Nav implements \ArrayAccess, \Iterator
+class Nav
 {
     /**
      * is the path to the file;
@@ -63,12 +62,6 @@ class Nav implements \ArrayAccess, \Iterator
     protected $_subnavs = array();
 
     //== public functions ============================================
-    /**
-     * needed to implement the Iterator-Interface
-     *
-     * @var int
-     */
-    private $_iterator = 0;
 
     /**
      * semantic structure:
@@ -110,16 +103,6 @@ class Nav implements \ArrayAccess, \Iterator
     }
 
     /**
-     * option() expects an object of one of the option-classes
-     *
-     * @param Option $option
-     */
-    public function option(Option $option)
-    {
-        $this->option[get_class($option)] = $option;
-    }
-
-    /**
      * Get or Set the value of $_label
      * Label is the value that the user will see
      * (hardcoded option)
@@ -139,6 +122,16 @@ class Nav implements \ArrayAccess, \Iterator
             // if no argument is set, the function returns the value of $_label
             return $this->_label;
         }
+    }
+
+    /**
+     * option() expects an object of one of the option-classes
+     *
+     * @param Option $option
+     */
+    public function option(Option $option)
+    {
+        $this->option[get_class($option)] = $option;
     }
 
     public function path($path = null)
@@ -296,8 +289,7 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return null
      */
-    public
-    function istheactive()
+    public function istheactive()
     {
         if (isset($this->_istheactive)) {
             return $this->_istheactive;
@@ -312,8 +304,7 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return bool
      */
-    public
-    function isactive()
+    public function isactive()
     {
         if (isset($this->_isactive)) {
             return $this->_isactive;
@@ -422,10 +413,8 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return option|option[]|bool
      */
-    public
-    function getoption(
-        $option = null
-    ) {
+    public function getoption($option = null)
+    {
         // alle zurueck geben, wenn keine spezielle gesetzt ist
         if (!isset($option)) {
             return $this->option;
@@ -452,13 +441,8 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return array
      */
-    public
-    function navlinks(
-        $visible = 'all',
-        $from = 0,
-        $to = -1,
-        $activeonly = false
-    ) {
+    public function navlinks($visible = 'all', $from = 0, $to = -1, $activeonly = false)
+    {
         $ret = array(0 => '');
 
         if (isset($this->option[__NAMESPACE__.'\\Option\\Visible']) &&
@@ -504,10 +488,8 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return string
      */
-    public
-    function xmlsitemap(
-        $visible = 'all'
-    ) {
+    public function xmlsitemap($visible = 'all')
+    {
         $ret = '';
         if (isset($this->option[__NAMESPACE__.'\\Option\\Visible']) &&
             $this->option[__NAMESPACE__.'\\Option\\Visible']->isvisible($visible)
@@ -533,11 +515,8 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return option|option[]|bool
      */
-    public
-    function getactiveoption(
-        $option,
-        $all = false
-    ) {
+    public function getactiveoption($option, $all = false)
+    {
         // is this element marked as active?
         if ($this->isactive()) {
             $return = false;
@@ -592,116 +571,6 @@ class Nav implements \ArrayAccess, \Iterator
 
         }
         return false;
-    }
-
-//== ArrayAccess methodes ========================================
-
-    /**
-     * @param string $visible
-     *
-     * @return bool
-     */
-    public
-    function isvisible(
-        $visible
-    ) {
-        return $this->option[__NAMESPACE__.'\\Option\\Visible']->isvisible($visible);
-    }
-
-    /**
-     * these methodes are needed to treat an object like an array
-     *
-     * @param int $offset
-     *
-     * @return nav
-     */
-    public
-    function offsetGet(
-        $offset
-    ) {
-        return $this->_subnavs[$offset];
-    }
-
-    /**
-     * @param int $offset
-     * @param nav $value
-     */
-    public
-    function offsetSet(
-        $offset,
-        $value
-    ) {
-        if (is_null($offset)) {
-            $this->_subnavs[] = $value;
-        } else {
-            $this->_subnavs[$offset] = $value;
-        }
-    }
-
-    /**
-     * @param int $offset
-     *
-     * @return bool
-     */
-    public
-    function offsetExists(
-        $offset
-    ) {
-        return isset($this->_subnavs[$offset]);
-    }
-
-//== Iterator methodes ===========================================
-
-    /**
-     * @param int $offset
-     */
-    public
-    function offsetUnset(
-        $offset
-    ) {
-        unset($this->_subnavs[$offset]);
-    }
-
-    /**
-     * methodes needed to iterate through the sub-nav-object with a foreach
-     */
-    public
-    function rewind()
-    {
-        $this->_iterator = 0;
-    }
-
-    /**
-     * @return nav
-     */
-    public
-    function current()
-    {
-        return $this->_subnavs[$this->_iterator];
-    }
-
-    /**
-     * @return int
-     */
-    public
-    function key()
-    {
-        return $this->_iterator;
-    }
-
-    public
-    function next()
-    {
-        $this->_iterator++;
-    }
-
-    /**
-     * @return bool
-     */
-    public
-    function valid()
-    {
-        return isset($this->_subnavs[$this->_iterator]);
     }
 }
 
