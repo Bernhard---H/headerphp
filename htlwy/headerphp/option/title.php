@@ -1,7 +1,6 @@
 <?php
 namespace htlwy\headerphp\Option;
 
-use htlwy\headerphp\Navroot;
 use htlwy\headerphp\Option;
 
 /**
@@ -10,15 +9,12 @@ use htlwy\headerphp\Option;
 class Title extends Option
 {
     /**
-     * The "default" language is used for websites with a single language
-     * and is the defaultvalue of navroot::$default_lang
-     *
-     * @var array
+     * @var string
      */
-    protected $_title = array('default' => '');
+    protected $_title = '';
 
     /**
-     * @param string|array $title
+     * @param string $title
      */
     public function __construct($title = null)
     {
@@ -28,63 +24,18 @@ class Title extends Option
     }
 
     /**
-     * Sets $_title. Expects $title either to be a string (for single
-     * language systems) or an array with the language as key.
-     *
-     * @param $title
-     *
-     * @throws \InvalidArgumentException
+     * @param string $title
      */
     public function set($title)
     {
-        if (is_array($title)) {
-            foreach ($title as $key => $value) {
-                $this->_title[strtolower($key)] = $value;
-                $this->_isdefault               = false;
-            }
-        } elseif ($title != '') {
-            $this->_title['default'] = $title;
-            $this->_isdefault        = false;
-        }
+        $this->_title = $title;
+        $this->_isdefault = false;
     }
 
     /**
-     * Returns the value for the current aktive language or a default
-     * one. If an argument is set, the function returns the value for
-     * the passed string
-     *
-     * @param null $lang
-     *
-     * @return mixed
+     * @return string
      */
-    public function get($lang = null)
-    {
-        if (isset($lang)) {
-            if (isset($this->_title[$lang])) {
-                return $this->_title[$lang];
-            } elseif (isset($this->_title[Navroot::$default_lang])) {
-                return $this->_title[Navroot::$default_lang];
-            } else {
-                return $this->_title['default'];
-            }
-        } else {
-            if (isset($this->_title[Navroot::$lang])) {
-                return $this->_title[Navroot::$lang];
-            } elseif (isset($this->_title[Navroot::$default_lang])) {
-                return $this->_title[Navroot::$default_lang];
-            } else {
-                return $this->_title['default'];
-            }
-        }
-    }
-
-    /**
-     * The function returns an array of all set languages and its values
-     * including the default value
-     *
-     * @return array
-     */
-    public function get_all()
+    public function get()
     {
         return $this->_title;
     }
