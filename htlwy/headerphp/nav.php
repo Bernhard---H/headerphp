@@ -61,12 +61,12 @@ class Nav implements \ArrayAccess, \Iterator
     /**
      * Schematischer Aufbau:
      * <code>
-     *      new nav([string $label [, string $path [, string $title [, string $head]]][, ...]]);
+     *      new nav([string $label [, string $path [, string $title]][, ...]]);
      * </code>
      *
-     * @param nav[]|option[]|mixed $properties
+     * @param mixed $properties
      */
-    public function __construct($properties = array(null))
+    public function __construct($properties = array())
     {
         $arguments = func_num_args();
 
@@ -79,19 +79,20 @@ class Nav implements \ArrayAccess, \Iterator
 
             $strings = 1;
             for ($i = 1; $i < $arguments; $i++) {
-                $propertie = func_get_arg($i);
-
-                if (is_string($propertie)) {
-                    if ($strings == 1) // the second string interpreted as path of the associated file
-                    {
-                        $this->path($propertie);
-                    } elseif ($strings == 2) // the thired string interpreted as title of the associated file
-                    {
-                        $this->options(new Title($propertie));
+                $property = func_get_arg($i);
+                if (isset($property)) {
+                    if (is_string($property)) {
+                        if ($strings == 1) // the second string interpreted as path of the associated file
+                        {
+                            $this->path($property);
+                        } elseif ($strings == 2) // the third string interpreted as title of the associated file
+                        {
+                            $this->options(new Title($property));
+                        }
+                        $strings++;
+                    } elseif (is_object($property)) {
+                        $this->add($property);
                     }
-                    $strings++;
-                } elseif (is_object($propertie) && isset($propertie)) {
-                    $this->add($propertie);
                 }
             }
         }
@@ -111,7 +112,7 @@ class Nav implements \ArrayAccess, \Iterator
             $this->option[get_class($option)] = $option;
         } else {
             throw new \InvalidArgumentException(
-                    'The passed object does not seem to be an instance of the "option" class!'
+                'The passed object does not seem to be an instance of the "option" class!'
             );
         }
     }
@@ -168,7 +169,7 @@ class Nav implements \ArrayAccess, \Iterator
                 }
 
                 if (isset($url['host']) && $url['host'] !=
-                                           (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'www.htlwy.ac.at')
+                    (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'www.htlwy.ac.at')
                 ) // external links
                 {
                     $this->_path = http_build_url($url);
@@ -223,9 +224,9 @@ class Nav implements \ArrayAccess, \Iterator
                 // if no path is set, the function tries to find one in its
                 // sub elements and returns the first found path
             {
-                $path        = '';
+                $path = '';
                 $num_subnavs = count($this->_subnavs);
-                $i           = 0;
+                $i = 0;
 
                 while ($path == '' && $i < $num_subnavs) {
                     $path = $this->_subnavs[$i]->path();
@@ -251,11 +252,11 @@ class Nav implements \ArrayAccess, \Iterator
     /**
      * Returns a simple navigation built with an HTML list
      *
-     * @param string $visible  will be the parameter of the isvisible(); method
+     * @param string $visible will be the parameter of the isvisible(); method
      *                         of the visible class
-     * @param int    $from     navigation will start with a subnav; 0 is this one
-     * @param int    $to       defines where to stop adding sub elements
-     * @param bool   $noactive function will ignore the status of activ e.g.: Sitemap
+     * @param int $from navigation will start with a subnav; 0 is this one
+     * @param int $to defines where to stop adding sub elements
+     * @param bool $noactive function will ignore the status of activ e.g.: Sitemap
      *
      * @return string
      */
@@ -274,8 +275,8 @@ class Nav implements \ArrayAccess, \Iterator
                     $ret .= 'class="'.navroot::$nav_activ_class.'" ';
                 }
                 $ret .= 'href="'.htmlentities($this->path()).'" target="'.$this->getoption('target')
-                                                                               ->target().'" >'.$this->_label.
-                        "</a>";
+                        ->target().'" >'.$this->_label.
+                    "</a>";
             }
 
             $from--;
@@ -344,7 +345,7 @@ class Nav implements \ArrayAccess, \Iterator
 
             $servername = parse_url($this->_path, PHP_URL_HOST);
             if ($active && !((isset($_SERVER['SERVER_NAME']) && $servername == $_SERVER['SERVER_NAME']) ||
-                             $servername == '')
+                    $servername == '')
             ) {
                 $active = false;
                 //echo '<br />false: '.$this->_path;
@@ -358,7 +359,7 @@ class Nav implements \ArrayAccess, \Iterator
             // check the GET requests
             // start the key with ! to exclude it
             if ($active && $query = parse_url($this->_path, PHP_URL_QUERY)) {
-                $get  = array();
+                $get = array();
                 $nget = array();
                 //echo '<br />false?: '.$this->_path;
 
@@ -415,7 +416,7 @@ class Nav implements \ArrayAccess, \Iterator
             }
             // END check get
 
-            $this->_isactive    = $active;
+            $this->_isactive = $active;
             $this->_istheactive = $active;
 
             // If this is not active, the functions checks the sub elements
@@ -458,11 +459,11 @@ class Nav implements \ArrayAccess, \Iterator
     /**
      * Returns an array of <a></a> tags with the links of the navigation
      *
-     * @param string $visible    will be the parameter of the isvisible(); method
+     * @param string $visible will be the parameter of the isvisible(); method
      *                           of the visible class
-     * @param int    $from       navigation will start with a subnav; 0 is this one
-     * @param int    $to         defines where to stop adding sub elements
-     * @param bool   $activeonly function will return only links form the active ones
+     * @param int $from navigation will start with a subnav; 0 is this one
+     * @param int $to defines where to stop adding sub elements
+     * @param bool $activeonly function will return only links form the active ones
      *
      * @return array
      */
@@ -481,7 +482,7 @@ class Nav implements \ArrayAccess, \Iterator
                     $ret[0] .= 'class="'.navroot::$nav_activ_class.'" ';
                 }
                 $ret[0] .= 'href="'.$this->path().'" target="'.$this->getoption('target')
-                                                                    ->target().'" >'.$this->_label."</a>";
+                        ->target().'" >'.$this->_label."</a>";
             }
 
             $from--;
@@ -508,7 +509,7 @@ class Nav implements \ArrayAccess, \Iterator
     /**
      * Returns a simple navigation built with an HTML list
      *
-     * @param string $visible  will be the parameter of the isvisible(); method
+     * @param string $visible will be the parameter of the isvisible(); method
      *                         of the visible class
      *
      * @return string
@@ -700,7 +701,7 @@ class Nav implements \ArrayAccess, \Iterator
  */
 function http_build_url($url)
 {
-    $ret      = '';
+    $ret = '';
     $protocol = false;
     if (isset($url['scheme'])) {
         $ret .= $url['scheme'].'://';
