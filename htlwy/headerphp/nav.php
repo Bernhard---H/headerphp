@@ -83,12 +83,9 @@ class Nav implements \ArrayAccess, \Iterator
     {
         $arguments = func_num_args();
 
-        $this->options(new Visible());
-        $this->options(new Target());
-
         if ($arguments >= 1) {
             $this->label(func_get_arg(0));
-            $this->options(new Title(func_get_arg(0)));
+            $this->option(new Title(func_get_arg(0)));
 
             $strings = 1;
             for ($i = 1; $i < $arguments; $i++) {
@@ -100,11 +97,13 @@ class Nav implements \ArrayAccess, \Iterator
                             $this->path($property);
                         } elseif ($strings == 2) // the third string interpreted as title of the associated file
                         {
-                            $this->options(new Title($property));
+                            $this->option(new Title($property));
                         }
                         $strings++;
-                    } elseif (is_object($property)) {
+                    } elseif ($property instanceof self) {
                         $this->add($property);
+                    } elseif ($property instanceof Option) {
+                        $this->option($property);
                     }
                 }
             }
@@ -112,22 +111,13 @@ class Nav implements \ArrayAccess, \Iterator
     }
 
     /**
-     * options() expects an object of one of the option-classes
-     * or NULL to return the array of options
+     * option() expects an object of one of the option-classes
      *
-     * @param option $option
-     *
-     * @throws \InvalidArgumentException
+     * @param Option $option
      */
-    public function options(Option $option = null)
+    public function option(Option $option)
     {
-        if ($option instanceof Option) {
-            $this->option[get_class($option)] = $option;
-        } else {
-            throw new \InvalidArgumentException(
-                'The passed object does not seem to be an instance of the "option" class!'
-            );
-        }
+        $this->option[get_class($option)] = $option;
     }
 
     /**
@@ -164,7 +154,7 @@ class Nav implements \ArrayAccess, \Iterator
             if (isset($url['host']) && $url['host'] != self::$SERVER_NAME) // external links
             {
                 $this->_path = self::http_build_url($url);
-                $this->option[__NAMESPACE__.'\\Option\\Target']->target(target::$target_others);
+                $this->option(new Target(Target::$target_others));
             } else {
                 if (substr($url['path'], 0, 1) != '/') {
                     $url['path'] = navroot::HOME.'/'.$url['path'];
@@ -234,15 +224,11 @@ class Nav implements \ArrayAccess, \Iterator
     }
 
     /**
-     * @param nav|option $object
+     * @param self $object
      */
-    public function add($object)
+    public function add(self $object)
     {
-        if ($object instanceof self) {
-            $this->_subnavs[] = $object;
-        } else {
-            $this->options($object);
-        }
+        $this->_subnavs[] = $object;
     }
 
     /**
@@ -256,16 +242,11 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return string
      */
-    public
-    function navigation(
-        $visible = 'all',
-        $from = 0,
-        $to = -1,
-        $noactive = false
-    ) {
+    public function navigation($visible = 'all', $from = 0, $to = -1, $noactive = false)
+    {
         $ret = '';
 
-        if (isset($this->option[__NAMESPACE__.'\\Option\\Visible']) &&
+        if (!isset($this->option[__NAMESPACE__.'\\Option\\Visible']) ||
             $this->option[__NAMESPACE__.'\\Option\\Visible']->isvisible($visible)
         ) {
             if ($from <= 0) {

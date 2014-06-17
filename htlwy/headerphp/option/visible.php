@@ -69,7 +69,7 @@ class Visible extends Option
             {
                 if($arg)
                     // The function will always return the set value
-                    // A bool value will overwrite all existing options
+                    // A bool value will overwrite all existing option
                 {
                     $this->_visible    = array();
                     $this->_nvisible   = array();
