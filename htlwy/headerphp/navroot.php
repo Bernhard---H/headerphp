@@ -25,7 +25,7 @@ class Navroot
      *
      * @var string
      */
-    public static $home = HP_HEADER;
+    const HOME = HP_HEADER;
 
     /**
      * Sets the current chosen language. At websites with only one language

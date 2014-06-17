@@ -11,6 +11,18 @@ use htlwy\headerphp\Option\Visible;
 class Nav implements \ArrayAccess, \Iterator
 {
     /**
+     * is the path to the file;
+     * it assumes that the file is in $_SERVER['DOCUMENT_ROOT']
+     * if the string does not start with a slash, the functiion will
+     * first try to find the path in the NAV_DEFAULT_ROOT directory
+     *
+     * @param null $path
+     *
+     * @return null|string
+     * @throws \InvalidArgumentException
+     */
+    private static $SERVER_NAME = '';
+    /**
      * represents the value the user will see
      * (hardcodierte option)
      *
@@ -49,6 +61,9 @@ class Nav implements \ArrayAccess, \Iterator
      * @var nav[]
      */
     protected $_subnavs = array();
+
+    //== public functions ============================================
+    //
     /**
      * needed to implement the Iterator-Interface
      *
@@ -56,8 +71,6 @@ class Nav implements \ArrayAccess, \Iterator
      */
     private $_iterator = 0;
 
-    //== public functions ============================================
-    //
     /**
      * Schematischer Aufbau:
      * <code>
@@ -139,96 +152,45 @@ class Nav implements \ArrayAccess, \Iterator
         }
     }
 
-    /**
-     * is the path to the file;
-     * it assumes that the file is in $_SERVER['DOCUMENT_ROOT']
-     * if the string does not start with a slash, the functiion will
-     * first try to find the path in the NAV_DEFAULT_ROOT directory
-     *
-     * @param null $path
-     *
-     * @return null|string
-     * @throws \InvalidArgumentException
-     */
     public function path($path = null)
     {
         if (isset($path)) {
-            if (is_string($path) && $path != '') {
-                //echo '<br />input: '.$path;
-                /*$query = '';
-                if(stristr($path, '?') !== false)
-                {
-                    $query = substr($path, strpos($path, '?'));
-                    $path = substr($path, 0, strpos($path, '?'));
-                }*/
-                $url = parse_url($path);
-
-                $pathmod = '';
-                if (substr($url['path'], 0, 1) != '/') {
-                    $pathmod = navroot::$home.'/'.$url['path'];
-                }
-
-                if (isset($url['host']) && $url['host'] !=
-                    (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'www.htlwy.ac.at')
-                ) // external links
-                {
-                    $this->_path = http_build_url($url);
-                    $this->option[__NAMESPACE__.'\\Option\\Target']->target(target::$target_others);
-                } elseif (file_exists(DOC_ROOT.$pathmod) && $pathmod != '')
-                    // checks if the path exists in the defined root directory
-                    // of this website: navroot::$home/*
-                {
-                    $url['path'] = $pathmod;
-                    $url['host'] = (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'www.htlwy.ac.at');;
-                    if (version_compare(PHP_VERSION, '5.4.7') < 0) {
-                        // parse_url() interpretiert URLs erst ab 5.4.7 auch ohne Protokol
-                        if (isset($_SERVER['HTTPS'])) {
-                            $url['scheme'] = 'https';
-                        } else {
-                            $url['scheme'] = 'http';
-                        }
-                    }
-                    $this->_path = http_build_url($url);
-                    $this->option[__NAMESPACE__.'\\Option\\Target']->target(target::$target_home);
-                } elseif (file_exists(DOC_ROOT.$url['path'])) {
-                    // checks if the path exits in the servers root directory
-                    $url['host'] = (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'www.htlwy.ac.at');;
-                    if (version_compare(PHP_VERSION, '5.4.7') < 0) {
-                        // parse_url() interpretiert URLs erst ab 5.4.7 auch ohne Protokol
-                        if (isset($_SERVER['HTTPS'])) {
-                            $url['scheme'] = 'https';
-                        } else {
-                            $url['scheme'] = 'http';
-                        }
-                    }
-                    $this->_path = http_build_url($url);
-                    $this->option[__NAMESPACE__.'\\Option\\Target']->target(target::$target_docroot);
-                } else
-                    // If the path could not be found, the link will open in
-                    // a new window.
-                {
-                    $this->_path = http_build_url($url);
-                    $this->option[__NAMESPACE__.'\\Option\\Target']->target(target::$target_others);
-                }
-            } elseif ($path != '') {
-                throw new \InvalidArgumentException('The path has to be a string!');
+            if (self::$SERVER_NAME == '') {
+                self::$SERVER_NAME = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'www.htlwy.ac.at';
             }
-        } else // if no argument is set, the function returns the value of $_path
-        {
-            if ($this->_path != '') {
-                /*$url = parse_url($this->_path);
-                $url['path'] = str_ireplace('.php', '', $url['path']);
-				return http_build_url($url);*/
+
+            $url = parse_url($path);
+
+            if (isset($url['host']) && $url['host'] != self::$SERVER_NAME) // external links
+            {
+                $this->_path = self::http_build_url($url);
+                $this->option[__NAMESPACE__.'\\Option\\Target']->target(target::$target_others);
+            } else {
+                if (substr($url['path'], 0, 1) != '/') {
+                    $url['path'] = navroot::HOME.'/'.$url['path'];
+                }
+                $url['host'] = self::$SERVER_NAME;
+                if (version_compare(PHP_VERSION, '5.4.7') < 0) {
+                    // parse_url() interpretiert URLs erst ab 5.4.7 auch ohne Protokol
+                    if (isset($_SERVER['HTTPS'])) {
+                        $url['scheme'] = 'https';
+                    } else {
+                        $url['scheme'] = 'http';
+                    }
+                }
+                $this->_path = self::http_build_url($url);
+            }
+        } else {
+            // if no argument is set, the function returns the value of $_path
+            if ($this->_path != "") {
                 return $this->_path;
-            } else
+            } else {
                 // if no path is set, the function tries to find one in its
                 // sub elements and returns the first found path
-            {
                 $path = '';
                 $num_subnavs = count($this->_subnavs);
                 $i = 0;
-
-                while ($path == '' && $i < $num_subnavs) {
+                while ($path == "" && $i < $num_subnavs) {
                     $path = $this->_subnavs[$i]->path();
                     $i++;
                 }
@@ -237,16 +199,53 @@ class Nav implements \ArrayAccess, \Iterator
         }
     }
 
+
     /**
      * @param nav|option $object
      */
-    public function add($object)
-    {
+    public
+    function add(
+        $object
+    ) {
         if ($object instanceof self) {
             $this->_subnavs[count($this->_subnavs)] = $object;
         } elseif ($object) {
             $this->options($object);
         }
+    }
+
+    /**
+     * http_build_url is a replica of the one in the http-functions
+     *
+     * @param $url
+     *
+     * @return string
+     */
+    protected static function http_build_url($url)
+    {
+        $ret = '';
+        $protocol = false;
+        if (isset($url['scheme'])) {
+            $ret .= $url['scheme'].'://';
+            $protocol = true;
+        }
+        if (isset($url['host'])) {
+            if (!$protocol) {
+                $ret .= '//';
+            }
+            $ret .= $url['host'];
+        }
+        if (isset($url['path'])) {
+            $ret .= $url['path'];
+        }
+        if (isset($url['query'])) {
+            $ret .= '?'.$url['query'];
+        }
+        if (isset($url['fragment'])) {
+            $ret .= '#'.$url['fragment'];
+        }
+
+        return $ret;
     }
 
     /**
@@ -260,8 +259,13 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return string
      */
-    public function navigation($visible = 'all', $from = 0, $to = -1, $noactive = false)
-    {
+    public
+    function navigation(
+        $visible = 'all',
+        $from = 0,
+        $to = -1,
+        $noactive = false
+    ) {
         $ret = '';
 
         if (isset($this->option[__NAMESPACE__.'\\Option\\Visible']) &&
@@ -315,7 +319,8 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return null
      */
-    public function istheactive()
+    public
+    function istheactive()
     {
         if (isset($this->_istheactive)) {
             return $this->_istheactive;
@@ -330,7 +335,8 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return bool
      */
-    public function isactive()
+    public
+    function isactive()
     {
         if (isset($this->_isactive)) {
             return $this->_isactive;
@@ -439,8 +445,10 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return option|option[]|bool
      */
-    public function getoption($option = null)
-    {
+    public
+    function getoption(
+        $option = null
+    ) {
         // alle zurueck geben, wenn keine spezielle gesetzt ist
         if (!isset($option)) {
             return $this->option;
@@ -467,8 +475,13 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return array
      */
-    public function navlinks($visible = 'all', $from = 0, $to = -1, $activeonly = false)
-    {
+    public
+    function navlinks(
+        $visible = 'all',
+        $from = 0,
+        $to = -1,
+        $activeonly = false
+    ) {
         $ret = array(0 => '');
 
         if (isset($this->option[__NAMESPACE__.'\\Option\\Visible']) &&
@@ -514,8 +527,10 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return string
      */
-    public function xmlsitemap($visible = 'all')
-    {
+    public
+    function xmlsitemap(
+        $visible = 'all'
+    ) {
         $ret = '';
         if (isset($this->option[__NAMESPACE__.'\\Option\\Visible']) &&
             $this->option[__NAMESPACE__.'\\Option\\Visible']->isvisible($visible)
@@ -541,8 +556,11 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return option|option[]|bool
      */
-    public function getactiveoption($option, $all = false)
-    {
+    public
+    function getactiveoption(
+        $option,
+        $all = false
+    ) {
         // is this element marked as active?
         if ($this->isactive()) {
             $return = false;
@@ -599,17 +617,20 @@ class Nav implements \ArrayAccess, \Iterator
         return false;
     }
 
+//== ArrayAccess methodes ========================================
+
     /**
      * @param string $visible
      *
      * @return bool
      */
-    public function isvisible($visible)
-    {
+    public
+    function isvisible(
+        $visible
+    ) {
         return $this->option[__NAMESPACE__.'\\Option\\Visible']->isvisible($visible);
     }
 
-    //== ArrayAccess methodes ========================================
     /**
      * these methodes are needed to treat an object like an array
      *
@@ -617,8 +638,10 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return nav
      */
-    public function offsetGet($offset)
-    {
+    public
+    function offsetGet(
+        $offset
+    ) {
         return $this->_subnavs[$offset];
     }
 
@@ -626,8 +649,11 @@ class Nav implements \ArrayAccess, \Iterator
      * @param int $offset
      * @param nav $value
      */
-    public function offsetSet($offset, $value)
-    {
+    public
+    function offsetSet(
+        $offset,
+        $value
+    ) {
         if (is_null($offset)) {
             $this->_subnavs[] = $value;
         } else {
@@ -640,24 +666,30 @@ class Nav implements \ArrayAccess, \Iterator
      *
      * @return bool
      */
-    public function offsetExists($offset)
-    {
+    public
+    function offsetExists(
+        $offset
+    ) {
         return isset($this->_subnavs[$offset]);
     }
+
+//== Iterator methodes ===========================================
 
     /**
      * @param int $offset
      */
-    public function offsetUnset($offset)
-    {
+    public
+    function offsetUnset(
+        $offset
+    ) {
         unset($this->_subnavs[$offset]);
     }
 
-    //== Iterator methodes ===========================================
     /**
      * methodes needed to iterate through the sub-nav-object with a foreach
      */
-    public function rewind()
+    public
+    function rewind()
     {
         $this->_iterator = 0;
     }
@@ -665,7 +697,8 @@ class Nav implements \ArrayAccess, \Iterator
     /**
      * @return nav
      */
-    public function current()
+    public
+    function current()
     {
         return $this->_subnavs[$this->_iterator];
     }
@@ -673,12 +706,14 @@ class Nav implements \ArrayAccess, \Iterator
     /**
      * @return int
      */
-    public function key()
+    public
+    function key()
     {
         return $this->_iterator;
     }
 
-    public function next()
+    public
+    function next()
     {
         $this->_iterator++;
     }
@@ -686,42 +721,11 @@ class Nav implements \ArrayAccess, \Iterator
     /**
      * @return bool
      */
-    public function valid()
+    public
+    function valid()
     {
         return isset($this->_subnavs[$this->_iterator]);
     }
 }
 
-/**
- * http_build_url is a replica of the one in the http-functions
- *
- * @param $url
- *
- * @return string
- */
-function http_build_url($url)
-{
-    $ret = '';
-    $protocol = false;
-    if (isset($url['scheme'])) {
-        $ret .= $url['scheme'].'://';
-        $protocol = true;
-    }
-    if (isset($url['host'])) {
-        if (!$protocol) {
-            $ret .= '//';
-        }
-        $ret .= $url['host'];
-    }
-    if (isset($url['path'])) {
-        $ret .= $url['path'];
-    }
-    if (isset($url['query'])) {
-        $ret .= '?'.$url['query'];
-    }
-    if (isset($url['fragment'])) {
-        $ret .= '#'.$url['fragment'];
-    }
 
-    return $ret;
-}
