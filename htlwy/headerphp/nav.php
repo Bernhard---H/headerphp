@@ -199,21 +199,6 @@ class Nav implements \ArrayAccess, \Iterator
         }
     }
 
-
-    /**
-     * @param nav|option $object
-     */
-    public
-    function add(
-        $object
-    ) {
-        if ($object instanceof self) {
-            $this->_subnavs[count($this->_subnavs)] = $object;
-        } elseif ($object) {
-            $this->options($object);
-        }
-    }
-
     /**
      * http_build_url is a replica of the one in the http-functions
      *
@@ -246,6 +231,18 @@ class Nav implements \ArrayAccess, \Iterator
         }
 
         return $ret;
+    }
+
+    /**
+     * @param nav|option $object
+     */
+    public function add($object)
+    {
+        if ($object instanceof self) {
+            $this->_subnavs[] = $object;
+        } else {
+            $this->options($object);
+        }
     }
 
     /**
