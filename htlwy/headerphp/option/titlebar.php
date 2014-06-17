@@ -31,14 +31,8 @@ class Titlebar extends Option
      */
     public function set($head)
     {
-        if (is_string($head)) {
-            if ($head != '') {
-                $this->_head      = $head;
-                $this->_isdefault = false;
-            }
-        } else {
-            throw new \InvalidArgumentException('The head has to be a string!');
-        }
+        $this->_head = $head;
+        $this->_isdefault = false;
     }
 
     /**

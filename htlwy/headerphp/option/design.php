@@ -27,20 +27,11 @@ class Design extends Option
 
     /**
      * @param string $design
-     *
-     * @throws \InvalidArgumentException
      */
     public function set($design)
     {
-        if(is_string($design))
-        {
-            $this->_design = strtolower($design);
-            $this->_isdefault = false;
-        }
-        else
-        {
-            throw new \InvalidArgumentException('The design-value has to be a string!');
-        }
+        $this->_design = $design;
+        $this->_isdefault = false;
     }
 
     /**

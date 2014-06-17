@@ -1,7 +1,6 @@
 <?php
 namespace htlwy\headerphp\Option;
 
-use htlwy\headerphp\Navroot;
 use htlwy\headerphp\Option;
 
 /**
@@ -10,110 +9,34 @@ use htlwy\headerphp\Option;
 class Description extends option
 {
     /**
-     * The default language is used for websites with a single language
-     * and is the defaultvalue of navroot::$default_lang
-     *
-     * @var array
+     * @var string
      */
-    protected $_descr = array('default' => '');
+    protected $_descr = '';
 
     /**
-     * @param string|string[] $descr
+     * @param string $descr
      */
     public function __construct($descr = null)
     {
-        if(isset($descr))
-        {
+        if (isset($descr)) {
             $this->set($descr);
         }
     }
 
     /**
-     * Sets $_descr. Expects $descr either to be a string (for single
-     * language systems) or an array with the language as key.
-     *
-     * @param string|string[] $descr
-     *
-     * @throws \InvalidArgumentException
+     * @param string $descr
      */
     public function set($descr)
     {
-        if(is_string($descr))
-        {
-            if($descr != '')
-            {
-                $this->_descr['default'] = $descr;
-                $this->_isdefault        = false;
-            }
-        }
-        elseif(is_array($descr))
-        {
-            foreach($descr as $key => $value)
-            {
-                $this->_descr[strtolower($key)] = $value;
-                $this->_isdefault               = false;
-            }
-        }
-        else
-        {
-            throw new \InvalidArgumentException(
-                    'The description has to be
-                                    a string or an array!');
-        }
+        $this->_descr = $descr;
+        $this->_isdefault = false;
     }
 
     /**
-     * Returns the value for the current aktive language or a default
-     * one. If an argument is set, the function returns the value for
-     * the passed string
-     *
-     * @param string $lang
-     *
-     * @return mixed
+     * @return string
      */
-    public function get($lang = null)
-    {
-        if(isset($lang))
-        {
-            if(isset($this->_descr[$lang]))
-            {
-                return $this->_descr[$lang];
-            }
-            elseif(isset($this->_descr[Navroot::$default_lang]))
-            {
-                return $this->_descr[Navroot::$default_lang];
-            }
-            else
-            {
-                return $this->_descr['default'];
-            }
-        }
-        else
-        {
-            if(isset($this->_descr[Navroot::$lang]))
-            {
-                return $this->_descr[Navroot::$lang];
-            }
-            elseif(isset($this->_descr[Navroot::$default_lang]))
-            {
-                return $this->_descr[Navroot::$default_lang];
-            }
-            else
-            {
-                return $this->_descr['default'];
-            }
-        }
-    }
-
-    /**
-     * The function returns an array of all set languages and its values
-     * including the default value
-     *
-     * @return string[]
-     */
-    public function get_all()
+    public function get()
     {
         return $this->_descr;
     }
-
 }

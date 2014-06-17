@@ -13,7 +13,7 @@ class Nav implements \ArrayAccess, \Iterator
     /**
      * is the path to the file;
      * it assumes that the file is in $_SERVER['DOCUMENT_ROOT']
-     * if the string does not start with a slash, the functiion will
+     * if the string does not start with a slash, the function will
      * first try to find the path in the NAV_DEFAULT_ROOT directory
      *
      * @param null $path
@@ -37,13 +37,13 @@ class Nav implements \ArrayAccess, \Iterator
      */
     protected $_path = '';
     /**
-     * caches the returnvalue of the function isactive()
+     * caches the return value of the function isactive()
      *
      * @var bool
      */
     protected $_isactive = null;
     /**
-     * caches the returnvalue of the function istheactive()
+     * caches the return value of the function istheactive()
      *
      * @var bool
      */
@@ -52,18 +52,17 @@ class Nav implements \ArrayAccess, \Iterator
      * addition options:
      * open link in new window, do not show the link in the sitemap
      *
-     * @var option[]
+     * @var Option[]
      */
     protected $option = array();
     /**
      * instances of this class
      *
-     * @var nav[]
+     * @var self[]
      */
     protected $_subnavs = array();
 
     //== public functions ============================================
-    //
     /**
      * needed to implement the Iterator-Interface
      *
@@ -72,7 +71,7 @@ class Nav implements \ArrayAccess, \Iterator
     private $_iterator = 0;
 
     /**
-     * Schematischer Aufbau:
+     * semantic structure:
      * <code>
      *      new nav([string $label [, string $path [, string $title]][, ...]]);
      * </code>
@@ -123,7 +122,7 @@ class Nav implements \ArrayAccess, \Iterator
     /**
      * Get or Set the value of $_label
      * Label is the value that the user will see
-     * (hardcodierte option)
+     * (hardcoded option)
      *
      * @param null $label
      *
@@ -154,7 +153,7 @@ class Nav implements \ArrayAccess, \Iterator
             if (isset($url['host']) && $url['host'] != self::$SERVER_NAME) // external links
             {
                 $this->_path = self::http_build_url($url);
-                $this->option(new Target(Target::$target_others));
+                $this->option(new Target('_blank'));
             } else {
                 if (substr($url['path'], 0, 1) != '/') {
                     $url['path'] = navroot::HOME.'/'.$url['path'];

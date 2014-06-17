@@ -27,18 +27,12 @@ class Manifest extends Option
     /**
      * path or url for the html-manifest-attribute
      *
-     * @param $manifest
-     *
-     * @throws \InvalidArgumentException
+     * @param string $manifest
      */
     public function set($manifest)
     {
-        if (is_string($manifest)) {
             $this->_manifest  = $manifest;
             $this->_isdefault = false;
-        } else {
-            throw new \InvalidArgumentException('The manifest-value has to be a string!');
-        }
     }
 
     /**

@@ -13,22 +13,14 @@ class Cache extends option
 
     public function __construct($cache = null)
     {
-        if(isset($cache))
-        {
+        if (isset($cache)) {
             $this->set($cache);
         }
     }
 
     public function set($cache)
     {
-        if($cache)
-        {
-            $this->cache      = true;
-        }
-        else
-        {
-            $this->cache = false;
-        }
+        $this->cache = $cache;
         $this->_isdefault = false;
     }
 

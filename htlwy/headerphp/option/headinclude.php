@@ -26,24 +26,13 @@ class Headinclude extends Option
      * @param string $include
      *
      * @return string
-     * @throws \InvalidArgumentException
      */
     public function headinclude($include = null)
     {
-        if(isset($include))
-        {
-            if(is_string($include))
-            {
-                $this->_headinclude = $include;
-                $this->_isdefault   = false;
-            }
-            else
-            {
-                throw new \InvalidArgumentException('The headerinclude has to be a string!');
-            }
-        }
-        else
-        {
+        if (isset($include)) {
+            $this->_headinclude = $include;
+            $this->_isdefault = false;
+        } else {
             return $this->_headinclude;
         }
     }

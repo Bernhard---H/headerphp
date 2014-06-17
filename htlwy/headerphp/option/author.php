@@ -1,7 +1,6 @@
 <?php
 namespace htlwy\headerphp\Option;
 
-use htlwy\headerphp\Navroot;
 use htlwy\headerphp\Option;
 
 /**
@@ -10,15 +9,12 @@ use htlwy\headerphp\Option;
 class author extends Option
 {
     /**
-     * The default language is used for websites with a single language
-     * and is the defaultvalue of navroot::$default_lang
-     *
-     * @var array
+     * @var string
      */
-    protected $_author = array('default' => '');
+    protected $_author = '';
 
     /**
-     * @param string|string[] $author
+     * @param string $author
      */
     public function __construct($author = null)
     {
@@ -28,72 +24,19 @@ class author extends Option
     }
 
     /**
-     * Sets $_author. Expects $author either to be a string (for single
-     * language systems) or an array with the language as key.
-     *
-     * @param string|string[] $author
-     *
-     * @throws \InvalidArgumentException
+     * @param string $author
      */
     public function set($author)
     {
-        if (is_string($author)) {
-            if ($author != '') {
-                $this->_author['default'] = $author;
-                $this->_isdefault         = false;
-            }
-        } elseif (is_array($author)) {
-            foreach ($author as $key => $value) {
-                $this->_author[strtolower($key)] = $value;
-                $this->_isdefault                = false;
-            }
-        } else {
-            throw new \InvalidArgumentException(
-                    'The description has to be
-                                    a string or an array!'
-            );
-        }
+        $this->_author = $author;
+        $this->_isdefault = false;
     }
 
     /**
-     * Returns the value for the current aktive language or a default
-     * one. If an argument is set, the function returns the value for
-     * the passed string
-     *
-     * @param string $lang
-     *
-     * @return mixed
+     * @return string
      */
-    public function get($lang = null)
-    {
-        if (isset($lang)) {
-            if (isset($this->_author[$lang])) {
-                return $this->_author[$lang];
-            } elseif (isset($this->_author[Navroot::$default_lang])) {
-                return $this->_author[Navroot::$default_lang];
-            } else {
-                return $this->_author['default'];
-            }
-        } else {
-            if (isset($this->_author[Navroot::$lang])) {
-                return $this->_author[Navroot::$lang];
-            } elseif (isset($this->_author[Navroot::$default_lang])) {
-                return $this->_author[Navroot::$default_lang];
-            } else {
-                return $this->_author['default'];
-            }
-        }
-    }
-
-    /**
-     * The function returns an array of all set languages and its values
-     * including the default value
-     *
-     * @return string[]
-     */
-    public function get_all()
+    public function get()
     {
         return $this->_author;
     }
-
 }

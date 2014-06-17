@@ -1,7 +1,6 @@
 <?php
 namespace htlwy\headerphp\Option;
 
-use htlwy\headerphp\Navroot;
 use htlwy\headerphp\Option;
 
 /**
@@ -10,108 +9,34 @@ use htlwy\headerphp\Option;
 class Keywords extends Option
 {
     /**
-     * The default language is used for websites with a single language
-     * and is the defaultvalue of navroot::$default_lang
-     *
-     * @var array
+     * @var string
      */
-    protected $_keywords = array('default' => '');
+    protected $_keywords = '';
 
     /**
-     * @param string|string[] $keywords
+     * @param string $keywords
      */
     public function __construct($keywords = null)
     {
-        if(isset($keywords))
-        {
+        if (isset($keywords)) {
             $this->set($keywords);
         }
     }
 
     /**
-     * Sets $_keywords. Expects $keywords either to be a string (for single
-     * language systems) or an array with the language as key.
-     *
-     * @param string|string[] $keywords
-     *
-     * @throws \InvalidArgumentException
+     * @param string $keywords
      */
     public function set($keywords)
     {
-        if(is_string($keywords))
-        {
-            if($keywords != '')
-            {
-                $this->_keywords['default'] = $keywords;
-                $this->_isdefault           = false;
-            }
-        }
-        elseif(is_array($keywords))
-        {
-            foreach($keywords as $key => $value)
-            {
-                $this->_keywords[strtolower($key)] = $value;
-                $this->_isdefault                  = false;
-            }
-        }
-        else
-        {
-            throw new \InvalidArgumentException(
-                    'The title has to be
-                                    a string or an array!');
-        }
+        $this->_keywords = $keywords;
+        $this->_isdefault = false;
+
     }
 
     /**
-     * Returns the value for the current aktive language or a default
-     * one. If an argument is set, the function returns the value for
-     * the passed string
-     *
-     * @param string $lang
-     *
-     * @return mixed
+     * @return string
      */
-    public function get($lang = null)
-    {
-        if(isset($lang))
-        {
-            if(isset($this->_keywords[$lang]))
-            {
-                return $this->_keywords[$lang];
-            }
-            elseif(isset($this->_keywords[Navroot::$default_lang]))
-            {
-                return $this->_keywords[Navroot::$default_lang];
-            }
-            else
-            {
-                return $this->_keywords['default'];
-            }
-        }
-        else
-        {
-            if(isset($this->_keywords[Navroot::$lang]))
-            {
-                return $this->_keywords[Navroot::$lang];
-            }
-            elseif(isset($this->_keywords[Navroot::$default_lang]))
-            {
-                return $this->_keywords[Navroot::$default_lang];
-            }
-            else
-            {
-                return $this->_keywords['default'];
-            }
-        }
-    }
-
-    /**
-     * The function returns an array of all set languages and its values
-     * including the default value
-     *
-     * @return string[]
-     */
-    public function get_all()
+    public function get()
     {
         return $this->_keywords;
     }
