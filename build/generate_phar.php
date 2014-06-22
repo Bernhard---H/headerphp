@@ -1,13 +1,21 @@
 <?php
 /**
- * generates the headerphp.phar archive for production use
+ * generates the header.phar archive for production use
  */
 
 chdir(__DIR__);
 
 $phar = new Phar(
-    'headerphp.phar',
+    'header.phar',
     FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME,
-    'headerphp.phar'
+    'header.phar'
 );
-$phar->buildFromDirectory('../src/htlwy', '/\.php$/');
+
+$phar->buildFromDirectory('../src', '/\.php$/');
+
+/**
+ * @todo index.php
+ */
+
+//$phar->addFile('index.php');
+//$phar->createDefaultStub('index.php');
