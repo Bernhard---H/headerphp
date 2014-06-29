@@ -13,9 +13,5 @@ $phar = new Phar(
 
 $phar->buildFromDirectory('../src', '/\.php$/');
 
-/**
- * @todo index.php
- */
-
-//$phar->addFile('index.php');
-//$phar->createDefaultStub('index.php');
+$phar->addFile('index.php');
+$phar->createDefaultStub('index.php');
